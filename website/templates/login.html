@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="form-container centered-div">
+    <div class="logo-container">
+      Log in to your account
+    </div>
+
+    <form class="form" method="post">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="Enter your username" required="True">
+        <p></p>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required="True">
+      </div>
+
+      <button class="form-submit-btn" type="submit">Login</button>
+    </form>
+
+    <p class="signup-link">
+      Don't have an account?
+      <a href="{{ url_for('auth.register') }}" class="signup-link link">Register now</a>
+    </p>
+  </div>
+{% endblock %}
+
+
