@@ -13,21 +13,24 @@ def register():
         username = request.form.get("username")
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
-
+        print(username)
+        print(password1)
+        print(password2)
+        flash("Form submitted succesfully!")
         if not username:
-            flash("Please enter a username!", category="error")
+            pass
         elif len(username) < 5:
-            flash("Username must be at least 5 characters!", category="error")
+            pass
         elif not password1:
-            flash("Please enter a password!", category="error")
+            pass
         elif len(password1) < 5:
-            flash("Password must be at least 5 characters!", category="error")
+            pass
         elif not password2:
-            flash("Please confirm password!", category="error")
+            pass
         elif password2 != password1:
-            flash("Passwords do not match!", category="error")
-    else:
-        return render_template("register.html")
+            pass
+
+    return render_template("register.html")
 
 @auth.route('/logout')
 def logout():
