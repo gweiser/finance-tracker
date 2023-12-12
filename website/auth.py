@@ -1,6 +1,5 @@
 from flask import Flask, Blueprint, render_template, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user
 
 from . import db
 from .models import User
@@ -37,7 +36,6 @@ def register():
         new_user = User(username=username, password=generate_password_hash(password1, method="pbkdf2:sha256"))
         db.session.add(new_user)
         db.session.commit()
-        login_user(new_user, remember=True)
         flash("Account created successfully!", "success")
     
     return render_template("register.html")
