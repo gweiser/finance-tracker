@@ -17,13 +17,13 @@ def register():
         username = request.form.get("username")
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
+        users = db.execute("SELECT username FROM users").fetchall()
 
-
-        # If user already exists
-        #if db.execute("SELECT * FROM users WHERE username = ?", username):
-            #flash("User already exists!", "error") 
+        print(*users)
         if not username:
             flash("Please provide a username!", "error")
+        elif username in users:
+            flash("Username already exists!", "error")
         elif len(username) < 5:
             flash("Username must be at least 5 characters!", "error")
         elif not password1:
@@ -34,11 +34,11 @@ def register():
             flash("Please confirm your password!", "error")
         elif password2 != password1:
             flash("Passwords do not match!", "error")
-
-        hashed_pwd = generate_password_hash(password1, "pbkdf2:sha256")
-        db.execute("INSERT INTO users (username, hashed_pwd) VALUES (?, ?)", (username, hashed_pwd))
-        db.commit()
-        flash("Account created successfully!", "success")
+        else:
+            hashed_pwd = generate_password_hash(password1, "pbkdf2:sha256")
+            db.execute("INSERT INTO users (username, hashed_pwd) VALUES (?, ?)", (username, hashed_pwd))
+            db.commit()
+            flash("Account created successfully!", "success")
         
     return render_template("register.html")
 

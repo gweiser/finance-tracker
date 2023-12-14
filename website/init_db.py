@@ -1,12 +1,12 @@
 import sqlite3
 
-connection = sqlite3.connect('database.db')
+db = sqlite3.connect('database.db')
 
 
 # with open("schema.sql") as f:
-#     connection.executescript(f.read())
+#     db.executescript(f.read())
 
-connection.executescript("""
+db.executescript("""
     DROP TABLE IF EXISTS users;
 
     CREATE TABLE users (
@@ -29,6 +29,5 @@ connection.executescript("""
     );      
                    """)
 
-
-connection.commit() 
-connection.close()
+db.commit() 
+db.close()
