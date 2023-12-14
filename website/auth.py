@@ -1,8 +1,11 @@
 from flask import Flask, Blueprint, render_template, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from website import get_db_connection
 
 auth = Blueprint('auth', __name__)
+
+# Connect to database
+db = get_db_connection()
 
 @auth.route('/login', methods=["GET", "POST"])
 def login():
@@ -15,7 +18,10 @@ def register():
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
 
+
         # If user already exists
+        #if db.execute("SELECT * FROM users WHERE username = ?", username):
+            #flash("User already exists!", "error") 
         if not username:
             flash("Please provide a username!", "error")
         elif len(username) < 5:
@@ -28,7 +34,12 @@ def register():
             flash("Please confirm your password!", "error")
         elif password2 != password1:
             flash("Passwords do not match!", "error")
-    
+
+        hashed_pwd = generate_password_hash(password1, "pbkdf2:sha256")
+        db.execute("INSERT INTO users (username, hashed_pwd) VALUES (?, ?)", (username, hashed_pwd))
+        db.commit()
+        flash("Account created successfully!", "success")
+        
     return render_template("register.html")
 
 @auth.route('/logout')
