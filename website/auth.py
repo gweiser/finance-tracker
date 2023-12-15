@@ -1,15 +1,25 @@
-from flask import Flask, Blueprint, render_template, request, flash
+from flask import Flask, Blueprint, render_template, request, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from website import get_db_connection
 
 auth = Blueprint('auth', __name__)
+
 
 # Connect to database
 db = get_db_connection()
 
 @auth.route('/login', methods=["GET", "POST"])
 def login():
-    return render_template("login.html")
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        hashed_pwd = db.execute("SELECT hashed_pwd FROM users WHERE username = ?", username)
+        unhashed_pwd = check_password_hash(hashed_pwd, password)
+        # Check if match
+        
+
+    else:
+        return render_template("login.html")
 
 @auth.route('/register', methods=["GET", "POST"])
 def register():
@@ -17,13 +27,13 @@ def register():
         username = request.form.get("username")
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
-        users = db.execute("SELECT username FROM users").fetchall()
 
-        print(*users)
+        users = db.execute("SELECT username FROM users").fetchall()
+        print(users)
         if not username:
             flash("Please provide a username!", "error")
         elif username in users:
-            flash("Username already exists!", "error")
+            flash("Username already exists", "error")
         elif len(username) < 5:
             flash("Username must be at least 5 characters!", "error")
         elif not password1:
