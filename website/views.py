@@ -19,7 +19,7 @@ def login():
         # if username isn't in database 
         if db.execute("SELECT 1 from users WHERE LOWER(username) = LOWER(?)", (username, )).fetchone() is None:
             flash("Username does not exist", "error")
-        # Check if match
+        # Check if no match
         elif hashed_pwd_string != input_hashed_string:
             flash("Password is incorrect!", "error")
         else:
@@ -28,6 +28,7 @@ def login():
             flash("Logged in successfully", "success")
             return redirect(url_for("views.home"))
         
+        # Bring user back to login
         return redirect(url_for("views.login"))
     
     else:
@@ -50,8 +51,8 @@ def register():
             flash("Username must be at least 5 characters!", "error")
         elif not password1:
             flash("Please provide password", "error")
-        elif len(password1) < 5:
-            flash("Password must be at least 5 characters long!", "error")
+        elif len(password1) < 3:
+            flash("Password must be at least 3 characters long!", "error")
         elif not password2:
             flash("Please confirm your password!", "error")
         elif password2 != password1:
@@ -63,6 +64,8 @@ def register():
             db.execute("INSERT INTO users (username, hashed_pwd) VALUES (?, ?)", (username, hashed_pwd_string))
             db.commit()
             flash("Account created successfully!", "success")
+            # Redirect user to login page
+            return redirect(url_for("views.login"))
         
     return render_template("register.html")
 
