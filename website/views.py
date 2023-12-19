@@ -22,13 +22,14 @@ def login():
         # Check if match
         elif hashed_pwd_string != input_hashed_string:
             flash("Password is incorrect!", "error")
-            
-        #Log in user
-        session["username"] = username
-        flash("Logged in successfully", "success")
-        return redirect(url_for("views.home"))
+        else:
+            #Log in user
+            session["username"] = username
+            flash("Logged in successfully", "success")
+            return redirect(url_for("views.home"))
         
-
+        return redirect(url_for("views.login"))
+    
     else:
         return render_template("login.html")
 
