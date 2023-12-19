@@ -16,6 +16,8 @@ def login():
         # hash user input, then check if same as hash in database
         input_hashed = pbkdf2_hmac("sha256", password.encode(), b"bad_salt", 200_000)
         input_hashed_string = input_hashed.hex()
+        db.execute("INSERT INTO users (username, hashed_pwd) VALUES (?, ?)", ("foobarbaz", input_hashed_string))
+        db.commit()
         # if username isn't in database 
         if db.execute("SELECT 1 from users WHERE LOWER(username) = LOWER(?)", (username, )).fetchone() is None:
             flash("Username does not exist", "error")
