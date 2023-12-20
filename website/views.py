@@ -77,8 +77,8 @@ def logout():
 
 @views.route('/')
 def home():
-    return '<h1>Foo</h1>'
-
+    return redirect(url_for("views.login"))
+    #return '<h1>Foo</h1>'
 
 @views.route('/add')
 def add():
