@@ -80,8 +80,10 @@ def register():
 
 @views.route('/logout', methods = ["GET", "POST"])
 def logout():
+    # Remove username from session and redirect to login page
+    username = session["username"]
     session["username"] = None
-    flash("Logged out!", "success")
+    flash(f"Goodbye, {username}", "success")
     return redirect(url_for("views.login"))    
 
 
