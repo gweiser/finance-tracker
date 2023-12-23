@@ -12,26 +12,33 @@ def login():
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
-        hashed_pwd_row = db.execute("SELECT hashed_pwd FROM users WHERE username = ?", (username, )).fetchone()
-        hashed_pwd_string = hashed_pwd_row["hashed_pwd"]
-        # hash user input, then check if same as hash in database
-        input_hashed = pbkdf2_hmac("sha256", password.encode(), b"bad_salt", 200_000)
-        input_hashed_string = input_hashed.hex()
-        # Check if no match
-        if hashed_pwd_string != input_hashed_string:
-            flash("Password is incorrect!", "error")
-        # if username isn't in database 
-        elif db.execute("SELECT 1 from users WHERE LOWER(username) = LOWER(?)", (username, )).fetchone() is None:
+        # Check for user not existing
+        if db.execute("SELECT 1 from users WHERE LOWER(username) = LOWER(?)", (username, )).fetchone() is None:
             flash("Username does not exist", "error")
-        else:
-            #Log in user
-            session["username"] = username
-            flash("Logged in successfully", "success")
-            return redirect(url_for("views.home"))
-        
+        # If user exists
+        else:    
+            # Get row from database
+            hashed_pwd_row = db.execute("SELECT hashed_pwd FROM users WHERE username = ?", (username, )).fetchone()
+            # Index into the hashed_pwd for that row
+            hashed_pwd_string = hashed_pwd_row["hashed_pwd"]
+
+            # hash user input (for comparing to database hash)
+            input_hashed = pbkdf2_hmac("sha256", password.encode(), b"bad_salt", 200_000)
+            input_hashed_string = input_hashed.hex()
+
+            # If passwords don't match
+            if hashed_pwd_string != input_hashed_string:
+                flash("Password is incorrect!", "error")
+            # If passwords match
+            else:
+                # Store user in session
+                session["username"] = username
+                flash("Logged in successfully", "success")
+                # Send user to main page
+                return redirect(url_for("views.home"))
+            
         # Bring user back to login
         return redirect(url_for("views.login"))
-    
     else:
         return render_template("login.html")
 
@@ -76,10 +83,11 @@ def logout():
     pass
 
 
-@views.route('/')
+@views.route('/', methods = ["GET", "POST"])
 def home():
-    return redirect(url_for("views.login"))
-    #return '<h1>Foo</h1>'
+    if request.method == "GET":
+        if session["username"] is not None:
+            return render_template("home.html")
 
 @views.route('/add')
 def add():
