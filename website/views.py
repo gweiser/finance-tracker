@@ -33,7 +33,7 @@ def login():
             else:
                 # Store user in session
                 session["username"] = username
-                flash("Logged in successfully", "success")
+                flash(f"Welcome, {username}!", "success")
                 # Send user to main page
                 return redirect(url_for("views.home"))
             
@@ -78,9 +78,11 @@ def register():
     return render_template("register.html")
 
 
-@views.route('/logout')
+@views.route('/logout', methods = ["GET", "POST"])
 def logout():
-    pass
+    session["username"] = None
+    flash("Logged out!", "success")
+    return redirect(url_for("views.login"))    
 
 
 @views.route('/', methods = ["GET", "POST"])
@@ -88,6 +90,8 @@ def home():
     if request.method == "GET":
         if session["username"] is not None:
             return render_template("home.html")
+        else:
+            return redirect(url_for("views.login"))
 
 @views.route('/add')
 def add():
