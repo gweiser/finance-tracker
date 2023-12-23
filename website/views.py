@@ -12,7 +12,8 @@ def login():
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
-        hashed_pwd_string = db.execute("SELECT hashed_pwd FROM users WHERE username = ?", (username, ))
+        hashed_pwd_row = db.execute("SELECT hashed_pwd FROM users WHERE username = ?", (username, )).fetchone()
+        hashed_pwd_string = hashed_pwd_row["hashed_pwd"]
         # hash user input, then check if same as hash in database
         input_hashed = pbkdf2_hmac("sha256", password.encode(), b"bad_salt", 200_000)
         input_hashed_string = input_hashed.hex()
