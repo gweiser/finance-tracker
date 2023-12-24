@@ -94,7 +94,21 @@ def logout():
 def home():
     if request.method == "GET":
         if session["username"] is not None:
-            return render_template("home.html")
+            current_user = session["username"]
+            current_user_id_row = db.execute("SELECT id FROM users WHERE username = ?", (current_user, )).fetchone()
+            current_user_id = current_user_id_row["id"]
+            expenses_row = db.execute("SELECT * FROM expenses WHERE user_id = ?", (current_user_id, )).fetchall()
+            counter = 0
+            expenses = []
+            for row in expenses_row:
+                expenses.append({"amount": expenses_row[counter]["amount"], 
+                                 "note": expenses_row[counter]["note"],
+                                 "location": expenses_row[counter]["expense_location"],
+                                 "date": expenses_row[counter]["expense_date"]})
+                counter+=1
+
+
+            return render_template("home.html", expenses=expenses)
         else:
             return redirect(url_for("views.login"))
 
