@@ -80,11 +80,14 @@ def register():
 
 @views.route('/logout', methods = ["GET", "POST"])
 def logout():
-    # Remove username from session and redirect to login page
-    username = session["username"]
-    session["username"] = None
-    flash(f"Goodbye, {username}", "success")
-    return redirect(url_for("views.login"))    
+    if session["username"] is not None:
+        # Remove username from session and redirect to login page
+        username = session["username"]
+        session["username"] = None
+        flash(f"Goodbye, {username}", "success")
+        return redirect(url_for("views.login"))    
+    else:
+        return redirect(url_for("views.login"))
 
 
 @views.route('/', methods = ["GET", "POST"])
@@ -95,7 +98,28 @@ def home():
         else:
             return redirect(url_for("views.login"))
 
-@views.route('/add')
-def add():
-    pass
+
+@views.route('/expense', methods = ["GET", "POST"])
+def expense():
+    if session["username"] is not None:
+        if request.method == "POST":
+            # Get all variables from form
+            amount = request.form.get("amount")
+            note = request.form.get("note")
+            location = request.form.get("location")
+            date = request.form.get("date")
+            user_id_row = db.execute("SELECT id FROM users WHERE username = ?", (session["username"], )).fetchone()
+            user_id = user_id_row["id"]
+            
+            # Insert values into database
+            db.execute("""
+                       INSERT INTO expenses(amount, note, expense_location, expense_date, user_id)
+                       VALUES (?, ?, ?, ?, ?)
+                       """, (amount, note, location, date, user_id))
+            db.commit()
+            
+        else:
+            return render_template("add.html")
+    else:
+        return redirect(url_for("views.login"))
 

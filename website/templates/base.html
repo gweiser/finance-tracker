@@ -20,13 +20,20 @@
               </button>
               <div class="collapse navbar-collapse" id="navbarNavDropdown">
                 <ul class="navbar-nav">
+                  <!--Home link-->
                   <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="{{ url_for('views.home') }}">Home</a>
                   </li>
-                  <!--Item in Navbar-->
-                  <li class="nav-item">
-                    <a class="nav-link" href="#">Add</a>
-                  <!--Dropdown menu-->
+                  <!--Dropdown for Add-->
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Add
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="{{ url_for('views.expense') }}">Expense</a></li>
+                    </ul>
+                  </li>                    
+                  <!--Dropdown for Account-->
                   <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       Account
