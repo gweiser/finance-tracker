@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <table clasS="table">
+        <tr>
+            <th>Amount</th>
+            <th>Note</th>
+            <th>Location</th>
+            <th>Date</th>
+        </tr>
+        {% for row in expenses %}
+            <tr>
+                <td>{{row.amount}}€</td>
+                <td>{{row.note}}</td>
+                <td>{{row.location}}</td>
+                <td>{{row.date}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

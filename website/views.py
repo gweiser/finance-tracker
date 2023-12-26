@@ -124,11 +124,7 @@ def expense():
             date = request.form.get("date")
             user_id_row = db.execute("SELECT id FROM users WHERE username = ?", (session["username"], )).fetchone()
             user_id = user_id_row["id"]
-            print(amount)
-            print(note)
-            print(location)
-            print(date)
-            print(user_id)
+
             # Insert values into database
             db.execute("""
                        INSERT INTO expenses(amount, note, expense_location, expense_date, user_id)
@@ -142,4 +138,3 @@ def expense():
             return render_template("expense.html")
     else:
         return redirect(url_for("views.login"))
-
