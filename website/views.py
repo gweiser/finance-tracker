@@ -138,3 +138,8 @@ def expense():
             return render_template("expense.html")
     else:
         return redirect(url_for("views.login"))
+    
+
+@views.route('/delete_expense', methods=["GET", "POST"])
+def delete_expense():
+    ...
