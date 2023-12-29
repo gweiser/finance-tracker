@@ -27,7 +27,19 @@ db.executescript("""
         user_id INTEGER NOT NULL,                         
         FOREIGN KEY(user_id) REFERENCES users(id)
     );      
-                   """)
+
+    DROP TABLE IF EXISTS owed_by;             
+
+    CREATE TABLE owed_by (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        amount INTEGER NOT NULL,
+        person TEXT NOT NULL,
+        creation_date date NOT NULL,
+        user_id INTEGER NOT NULL,
+        FOREIGN KEY(user_id) REFERENCES users(id)  
+    );
+     """)
+
 
 db.commit() 
 db.close()
