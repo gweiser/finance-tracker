@@ -107,7 +107,6 @@ def home():
                                  "date": expenses_row[counter]["expense_date"]})
                 counter+=1
 
-
             return render_template("home.html", expenses=expenses)
         else:
             return redirect(url_for("views.login"))
@@ -142,4 +141,14 @@ def expense():
 
 @views.route('/loan_to', methods=["GET", "POST"])
 def loan_to():
-    return render_template("loan_to.html")
+    if request.method == "POST":
+        if session["username"] is not None:
+            amount = request.form.get("amount")
+            person = request.form.get("person")
+            date = request.form.get("date")
+
+            # TODO: Insert into database
+        else:
+            return render_template(url_for("views.login"))
+    else:
+        return render_template("loan_to.html")

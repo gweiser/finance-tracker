@@ -1,1 +1,25 @@
 {% extends "base.html" %}
+
+{% block body %}
+<form method="post">
+    <h2>Add Loan To</h2>
+    <div class="mb-3">
+      <label for="amount" class="form-label">Amount (€)</label>
+      <input type="number" class="form-control" name="amount" id="amount" required>
+    </div>
+    <div class="mb-3">
+        <label for="person" class="form-label">Person</label>
+        <input type="text" class="form-control" name="person" id="person" required>
+    </div>
+    <div class="mb-3">
+        <label for="creation_date" class="form-label">Date</label>
+        <input type="date" class="form-control" name="creation_date" id="creation_date">
+    </div>
+
+
+    <div class="mb-3">
+        <input type="reset" value="Reset">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+{% endblock %}
