@@ -140,6 +140,6 @@ def expense():
         return redirect(url_for("views.login"))
     
 
-@views.route('/delete_expense', methods=["GET", "POST"])
-def delete_expense():
-    ...
+@views.route('/loan_to', methods=["GET", "POST"])
+def loan_to():
+    return render_template("loan_to.html")

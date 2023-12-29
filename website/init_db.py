@@ -15,7 +15,6 @@ db.executescript("""
         hashed_pwd TEXT NOT NULL
         );
 
-
     DROP TABLE IF EXISTS expenses;
 
     CREATE TABLE expenses (
@@ -28,9 +27,9 @@ db.executescript("""
         FOREIGN KEY(user_id) REFERENCES users(id)
     );      
 
-    DROP TABLE IF EXISTS owed_by;             
+    DROP TABLE IF EXISTS loan_to;             
 
-    CREATE TABLE owed_by (
+    CREATE TABLE loan_to (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         amount INTEGER NOT NULL,
         person TEXT NOT NULL,
