@@ -38,7 +38,7 @@ def login():
                 return redirect(url_for("views.home"))
             
         # Bring user back to login
-        return redirect(url_for("views.login"))
+        return redirect(url_for("views.login")) 
     else:
         return render_template("login.html")
 
@@ -114,36 +114,56 @@ def home():
 
 
 @views.route('/expense', methods = ["GET", "POST"])
-@views.route("/expense/edit/<int:id>")
+@views.route("/expense/edit/<int:id>", methods=["GET", "POST"])
 def expense(id=None):
     if session["username"] is not None:
         data = None
+        user_id_row = db.execute("SELECT id FROM users WHERE username = ?", (session["username"], )).fetchone()
+        user_id = user_id_row["id"]
+
+        # if edit button is pressed (if an id is inputted)
         if id is not None:
-            #If called with id
-            data_row = db.execute("SELECT * FROM expenses WHERE id = ?", (id, )).fetchone()
+            if request.method == "GET":
+                data = db.execute("SELECT * FROM expenses WHERE id = ?", (id, )).fetchone()
 
-            return render_template("expense.html", data=data_row)
-        
-        if request.method == "POST":
-            # Get all variables from form
-            amount = request.form.get("amount")
-            note = request.form.get("note")
-            location = request.form.get("location")
-            date = request.form.get("date")
-            user_id_row = db.execute("SELECT id FROM users WHERE username = ?", (session["username"], )).fetchone()
-            user_id = user_id_row["id"]
+                return render_template("expense.html", data=data)
+            else:
+                db.execute("DELETE FROM expenses WHERE id = ?", (id, ))
 
-            # Insert values into database
-            db.execute("""
-                       INSERT INTO expenses(amount, note, expense_location, expense_date, user_id)
-                       VALUES (?, ?, ?, ?, ?)
-                       """, (amount, note, location, date, user_id))
-            db.commit()
-            flash("Expense added!", "success")
-            return redirect(url_for("views.home"))
-            
-        else:
-            return render_template("expense.html", data=None)
+                amount = request.form.get("amount")
+                note = request.form.get("note")
+                location = request.form.get("location")
+                date = request.form.get("date")
+
+                db.execute("""
+                        INSERT INTO expenses(id, amount, note, expense_location, expense_date, user_id)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                        """, (id, amount, note, location, date, user_id))           
+                db.commit()
+
+                flash("Changes saved!", "success")     
+                return redirect(url_for("views.home"))
+        else:      
+            if request.method == "POST":
+                # Get all variables from form
+                amount = request.form.get("amount")
+                note = request.form.get("note")
+                location = request.form.get("location")
+                date = request.form.get("date")
+
+
+
+                # Insert values into database
+                db.execute("""
+                        INSERT INTO expenses(amount, note, expense_location, expense_date, user_id)
+                        VALUES (?, ?, ?, ?, ?)
+                        """, (amount, note, location, date, user_id))
+                db.commit()
+                flash("Expense added!", "success")
+                return redirect(url_for("views.home"))
+                
+            else:
+                return render_template("expense.html", data=None)
     else:
         return redirect(url_for("views.login"))
     
