@@ -104,7 +104,8 @@ def home():
                 expenses.append({"amount": expenses_row[counter]["amount"], 
                                  "note": expenses_row[counter]["note"],
                                  "location": expenses_row[counter]["expense_location"],
-                                 "date": expenses_row[counter]["expense_date"]})
+                                 "date": expenses_row[counter]["expense_date"],
+                                 "id": expenses_row[counter]["id"]})
                 counter+=1
 
             return render_template("home.html", expenses=expenses)
@@ -113,8 +114,16 @@ def home():
 
 
 @views.route('/expense', methods = ["GET", "POST"])
-def expense():
+@views.route("/expense/edit/<int:id>")
+def expense(id=None):
     if session["username"] is not None:
+        data = None
+        if id is not None:
+            #If called with id
+            data_row = db.execute("SELECT * FROM expenses WHERE id = ?", (id, )).fetchone()
+
+            return render_template("expense.html", data=data_row)
+        
         if request.method == "POST":
             # Get all variables from form
             amount = request.form.get("amount")
@@ -134,21 +143,22 @@ def expense():
             return redirect(url_for("views.home"))
             
         else:
-            return render_template("expense.html")
+            return render_template("expense.html", data=None)
     else:
         return redirect(url_for("views.login"))
     
 
 @views.route('/loan_to', methods=["GET", "POST"])
 def loan_to():
-    if request.method == "POST":
-        if session["username"] is not None:
+    if session["username"] is not None:
+        if request.method == "POST":
             amount = request.form.get("amount")
             person = request.form.get("person")
             date = request.form.get("date")
 
             # TODO: Insert into database
+                
         else:
-            return render_template(url_for("views.login"))
+            return render_template("loan_to.html")
     else:
-        return render_template("loan_to.html")
+        return redirect(url_for("views.login"))

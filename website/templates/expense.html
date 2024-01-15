@@ -5,19 +5,19 @@
     <h2>Add Expense</h2>
     <div class="mb-3">
       <label for="amount" class="form-label">Amount (€)</label>
-      <input type="number" class="form-control" name="amount" id="amount" required>
+      <input type="number" class="form-control" name="amount" id="amount" required value="{{data.amount}}">
     </div>
     <div class="mb-3">
       <label for="note" class="form-label">Note</label>
-      <input type="text" class="form-control" name="note" id="note" >
+      <input type="text" class="form-control" name="note" id="note" required value="{{data.note}}">
     </div>
     <div class="mb-3">
         <label for="location" class="form-label">Location</label>
-        <input type="text" class="form-control" name="location" id="location">
+        <input type="text" class="form-control" name="location" id="location" required value="{{data.location}}">
     </div>    
     <div class="mb-3">
         <label for="date" class="form-label">Date</label>
-        <input type="date" class="form-control" name="date" id="date">
+        <input type="date" class="form-control" name="date" id="date" required value="{{data.date}}">
     </div>
     <div class="mb-3">
         <input type="reset" value="Reset">
