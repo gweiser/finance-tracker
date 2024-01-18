@@ -167,6 +167,19 @@ def expense(id=None):
     else:
         return redirect(url_for("views.login"))
     
+@views.route('/delete/<int:id>', methods=["GET", "POST"])
+def delete(id=None):
+    # If id is provided (if delete button is clicked)
+    if id is not None:
+        db.execute("DELETE FROM expenses WHERE id = ?", (id, ))
+        db.commit()
+        flash("Deleted!", "success")
+        return redirect(url_for("views.home"))
+    # If no id
+    else:
+        return redirect(url_for("views.home"))
+
+
 
 @views.route('/loan_to', methods=["GET", "POST"])
 def loan_to():
