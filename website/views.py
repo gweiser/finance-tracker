@@ -171,9 +171,17 @@ def expense(id=None):
 def delete(id=None):
     # If id is provided (if delete button is clicked)
     if id is not None:
+        # Get data
+        data = db.execute("SELECT * FROM expenses WHERE id = ?", (id, )).fetchone()
+        # Insert data into bin
+        db.execute("""
+            INSERT INTO bin(id, amount, note, expense_location, expense_date, user_id)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (id, data["amount"], data["note"], data["expense_location"], data["expense_date"], data["user_id"]))
+        # Delete data from expenses
         db.execute("DELETE FROM expenses WHERE id = ?", (id, ))
         db.commit()
-        flash("Deleted!", "success")
+        flash("Moved to bin", "success")
         return redirect(url_for("views.home"))
     # If no id
     else:

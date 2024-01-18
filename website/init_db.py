@@ -37,7 +37,20 @@ db.executescript("""
         user_id INTEGER NOT NULL,
         FOREIGN KEY(user_id) REFERENCES users(id)  
     );
-     """)
+
+    DROP TABLE IF EXISTS bin;
+
+    CREATE TABLE bin (
+        id INTEGER PRIMARY KEY,
+        amount INTEGER NOT NULL,
+        note TEXT NOT NULL,
+        expense_location TEXT NOT NULL,
+        expense_date TEXT NOT NULL,
+        user_id INTEGER NOT NULL
+    );
+
+     """ 
+     )
 
 
 db.commit() 
