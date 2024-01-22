@@ -7,6 +7,8 @@
             <th>Note</th>
             <th>Location</th>
             <th>Date</th>
+            <th></th>
+            <th></th>
         </tr>
         {% for row in expenses %}
             <tr>
@@ -14,8 +16,16 @@
                 <td>{{row.note}}</td>
                 <td>{{row.location}}</td>
                 <td>{{row.date}}</td>
-                <td><a href="{{url_for('views.expense', id=row.id)}}">Edit</a></td>
-                <td><a href="{{url_for('views.delete', id=row.id)}}" onclick="return confirm('Are you sure?')">Delete</a></td>
+                <td>
+                    <a href="{{url_for('views.expense', id=row.id)}}">
+                        <button type="button" class="btn btn-warning">Edit</button>
+                    </a>                                    
+                </td>
+                <td>
+                    <a href="{{url_for('views.delete', id=row.id)}}" onclick="return confirm('Are you sure?')">
+                        <button type="button" class="btn btn-danger">Delete</button>
+                    </a>
+                </td>
             </tr>
         {% endfor %}
     </table>
