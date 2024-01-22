@@ -167,6 +167,7 @@ def expense(id=None):
     else:
         return redirect(url_for("views.login"))
     
+    
 @views.route('/delete/<int:id>', methods=["GET", "POST"])
 def delete(id=None):
     # If id is provided (if delete button is clicked)
@@ -185,12 +186,21 @@ def delete(id=None):
 def loan_to():
     if session["username"] is not None:
         if request.method == "POST":
+            user_id_row = db.execute("SELECT id FROM users WHERE username = ?", (session["username"], )).fetchone()
+            user_id = user_id_row["id"]
             amount = request.form.get("amount")
             person = request.form.get("person")
-            date = request.form.get("date")
+            creation_date = request.form.get("creation_date")
+            return_date = request.form.get("return_date")
 
             # TODO: Insert into database
-                
+            db.execute("""
+                       INSERT INTO loan_to (amount, person, creation_date, return_date, user_id)
+                       VALUES (?, ?, ?, ?, ?)
+                       """, (amount, person, creation_date, return_date, user_id))
+            db.commit()
+            flash("Added!", "success")
+            return redirect(url_for("views.home"))                
         else:
             return render_template("loan_to.html")
     else:
