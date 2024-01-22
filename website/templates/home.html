@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
 {% block body %}
+    <br>
+    <h3>Expenses</h3>
     <table class="table">
         <tr>
             <th>Amount</th>
@@ -15,7 +17,29 @@
                 <td>{{row.location}}</td>
                 <td>{{row.date}}</td>
                 <td><a href="{{url_for('views.expense', id=row.id)}}">Edit</a></td>
-                <td><a href="{{url_for('views.delete', id=row.id)}}" onclick="return confirm('Are you sure?')">Delete</a></td>
+                <td><a href="{{url_for('views.delete_expense', id=row.id)}}" onclick="return confirm('Are you sure?')">Delete</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+
+    <h3>Loans To People</h3>
+    <table class="table">
+        <tr>
+            <th>Amount</th>
+            <th>Person</th>
+            <th>Note</th>
+            <th>Creation Date</th>
+            <th>Return Date</th>
+        </tr>
+        {% for row in loans_to %}
+            <tr>
+                <td>{{row.amount}}€</td>
+                <td>{{row.person}}</td>
+                <td>{{row.note}}</td>
+                <td>{{row.creation_date}}</td>
+                <td>{{row.return_date}}</td>
             </tr>
         {% endfor %}
     </table>

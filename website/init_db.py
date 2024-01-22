@@ -33,6 +33,7 @@ db.executescript("""
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         amount INTEGER NOT NULL,
         person TEXT NOT NULL,
+        note TEXT NOT NULL,
         creation_date date NOT NULL,
         return_date date NOT NULL,
         user_id INTEGER NOT NULL,
