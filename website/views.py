@@ -208,10 +208,12 @@ def delete_expense(id=None):
 @views.route('/loan_to/edit/<int:id>', methods=["GET", "POST"])
 def loan_to(id=None):
     if session["username"] is not None:
+        user_id = db.execute("SELECT id FROM users WHERE username = ?", (session["username"], )).fetchone()["id"]
         # If id is parsed
         if id is not None:
+
             if request.method == "GET":
-                    data = db.execute("SELECT * FROM loan_to WHERE id = ?", (id, ))
+                    data = db.execute("SELECT * FROM loan_to WHERE id = ?", (id, )).fetchone()
 
                     return render_template("loan_to.html", data=data)
             else:
@@ -225,9 +227,9 @@ def loan_to(id=None):
                 db.execute("DELETE FROM loan_to WHERE id = ?", (id, ))
                 # Insert new values
                 db.execute("""
-                    INSERT INTO loan_to (id, amount, person, note, creation_date, return_date)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                           """, (id, amount, person, note, creation_date, return_date))
+                    INSERT INTO loan_to (id, amount, person, note, creation_date, return_date, user_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                           """, (id, amount, person, note, creation_date, return_date, user_id))
                 db.commit()
                 flash("Entry changed!", "success")
                 return redirect(url_for("views.home"))
@@ -250,7 +252,7 @@ def loan_to(id=None):
                 flash("Added!", "success")
                 return redirect(url_for("views.home"))                
             else:
-                return render_template("loan_to.html")
+                return render_template("loan_to.html", data=None)
     else:
         return redirect(url_for("views.login"))
     
