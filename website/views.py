@@ -197,26 +197,57 @@ def delete_expense(id=None):
 
 
 @views.route('/loan_to', methods=["GET", "POST"])
-def loan_to():
+@views.route('/loan_to/edit/<int:id>', methods=["GET", "POST"])
+def loan_to(id=None):
     if session["username"] is not None:
-        if request.method == "POST":
-            user_id_row = db.execute("SELECT id FROM users WHERE username = ?", (session["username"], )).fetchone()
-            user_id = user_id_row["id"]
-            amount = request.form.get("amount")
-            person = request.form.get("person")
-            note = request.form.get("note")
-            creation_date = request.form.get("creation_date")
-            return_date = request.form.get("return_date")
+        # If id is parsed
+        if id is not None:
+            if request.method == "GET":
+                    data = db.execute("SELECT * FROM loan_to WHERE id = ?", (id, ))
 
-            # TODO: Insert into database
-            db.execute("""
-                       INSERT INTO loan_to (amount, person, note, creation_date, return_date, user_id)
-                       VALUES (?, ?, ?, ?, ?, ?)
-                       """, (amount, person, note, creation_date, return_date, user_id))
-            db.commit()
-            flash("Added!", "success")
-            return redirect(url_for("views.home"))                
+                    return render_template("loan_to.html", data=data)
+            else:
+                amount = request.form.get("amount")
+                person = request.form.get("person")
+                note = request.form.get("note")
+                creation_date = request.form.get("creation_date")
+                return_date = request.form.get("return_date")
+
+                # Delete old entry
+                db.execute("DELETE FROM loan_to WHERE id = ?", (id, ))
+                # Insert new values
+                db.execute("""
+                    INSERT INTO loan_to (id, amount, person, note, creation_date, return_date)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                           """, (id, amount, person, note, creation_date, return_date))
+                db.commit()
+                flash("Entry changed!", "success")
+                return redirect(url_for("views.home"))
         else:
-            return render_template("loan_to.html")
+            if request.method == "POST":
+                user_id_row = db.execute("SELECT id FROM users WHERE username = ?", (session["username"], )).fetchone()
+                user_id = user_id_row["id"]
+                amount = request.form.get("amount")
+                person = request.form.get("person")
+                note = request.form.get("note")
+                creation_date = request.form.get("creation_date")
+                return_date = request.form.get("return_date")
+
+                # TODO: Insert into database
+                db.execute("""
+                        INSERT INTO loan_to (amount, person, note, creation_date, return_date, user_id)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                        """, (amount, person, note, creation_date, return_date, user_id))
+                db.commit()
+                flash("Added!", "success")
+                return redirect(url_for("views.home"))                
+            else:
+                return render_template("loan_to.html")
     else:
         return redirect(url_for("views.login"))
+    
+
+@views.route('/delete_loans_to/<int:id>', methods=["GET", "POST"])
+def delete_loans_to(id=None):
+    #TODO: Move to bin
+    ...
