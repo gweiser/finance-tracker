@@ -98,17 +98,31 @@ def home():
             current_user_id_row = db.execute("SELECT id FROM users WHERE username = ?", (current_user, )).fetchone()
             current_user_id = current_user_id_row["id"]
             expenses_row = db.execute("SELECT * FROM expenses WHERE user_id = ?", (current_user_id, )).fetchall()
-            counter = 0
+            loans_to_row = db.execute("SELECT * FROM loan_to WHERE user_id = ?", (current_user_id, )).fetchall()
+            # Get all expenses
             expenses = []
-            for row in expenses_row:
-                expenses.append({"amount": expenses_row[counter]["amount"], 
-                                 "note": expenses_row[counter]["note"],
-                                 "location": expenses_row[counter]["expense_location"],
-                                 "date": expenses_row[counter]["expense_date"],
-                                 "id": expenses_row[counter]["id"]})
-                counter+=1
+            expense_counter = 0
+            for _ in expenses_row:
+                expenses.append({"amount": expenses_row[expense_counter]["amount"], 
+                                 "note": expenses_row[expense_counter]["note"],
+                                 "location": expenses_row[expense_counter]["expense_location"],
+                                 "date": expenses_row[expense_counter]["expense_date"],
+                                 "id": expenses_row[expense_counter]["id"]})
+                expense_counter+=1
 
-            return render_template("home.html", expenses=expenses)
+            loans_to = []
+            loans_to_counter = 0
+            for _ in loans_to_row:
+                loans_to.append({"amount": loans_to_row[loans_to_counter]["amount"],
+                                 "person": loans_to_row[loans_to_counter]["person"],
+                                 "note": loans_to_row[loans_to_counter]["note"],
+                                 "creation_date": loans_to_row[loans_to_counter]["creation_date"],
+                                 "return_date": loans_to_row[loans_to_counter]["return_date"],
+                                 "id": loans_to_row[loans_to_counter]["id"]})
+                loans_to_counter+=1
+
+                
+            return render_template("home.html", expenses=expenses, loans_to=loans_to)
         else:
             return redirect(url_for("views.login"))
 
@@ -167,8 +181,9 @@ def expense(id=None):
     else:
         return redirect(url_for("views.login"))
     
-@views.route('/delete/<int:id>', methods=["GET", "POST"])
-def delete(id=None):
+    
+@views.route('/delete_expense/<int:id>', methods=["GET", "POST"])
+def delete_expense(id=None):
     # If id is provided (if delete button is clicked)
     if id is not None:
         # Get data
@@ -190,16 +205,57 @@ def delete(id=None):
 
 
 @views.route('/loan_to', methods=["GET", "POST"])
-def loan_to():
+@views.route('/loan_to/edit/<int:id>', methods=["GET", "POST"])
+def loan_to(id=None):
     if session["username"] is not None:
-        if request.method == "POST":
-            amount = request.form.get("amount")
-            person = request.form.get("person")
-            date = request.form.get("date")
+        # If id is parsed
+        if id is not None:
+            if request.method == "GET":
+                    data = db.execute("SELECT * FROM loan_to WHERE id = ?", (id, ))
 
-            # TODO: Insert into database
-                
+                    return render_template("loan_to.html", data=data)
+            else:
+                amount = request.form.get("amount")
+                person = request.form.get("person")
+                note = request.form.get("note")
+                creation_date = request.form.get("creation_date")
+                return_date = request.form.get("return_date")
+
+                # Delete old entry
+                db.execute("DELETE FROM loan_to WHERE id = ?", (id, ))
+                # Insert new values
+                db.execute("""
+                    INSERT INTO loan_to (id, amount, person, note, creation_date, return_date)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                           """, (id, amount, person, note, creation_date, return_date))
+                db.commit()
+                flash("Entry changed!", "success")
+                return redirect(url_for("views.home"))
         else:
-            return render_template("loan_to.html")
+            if request.method == "POST":
+                user_id_row = db.execute("SELECT id FROM users WHERE username = ?", (session["username"], )).fetchone()
+                user_id = user_id_row["id"]
+                amount = request.form.get("amount")
+                person = request.form.get("person")
+                note = request.form.get("note")
+                creation_date = request.form.get("creation_date")
+                return_date = request.form.get("return_date")
+
+                # TODO: Insert into database
+                db.execute("""
+                        INSERT INTO loan_to (amount, person, note, creation_date, return_date, user_id)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                        """, (amount, person, note, creation_date, return_date, user_id))
+                db.commit()
+                flash("Added!", "success")
+                return redirect(url_for("views.home"))                
+            else:
+                return render_template("loan_to.html")
     else:
         return redirect(url_for("views.login"))
+    
+
+@views.route('/delete_loans_to/<int:id>', methods=["GET", "POST"])
+def delete_loans_to(id=None):
+    #TODO: Move to bin
+    ...

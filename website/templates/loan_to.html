@@ -5,15 +5,23 @@
     <h2>Add Loan To</h2>
     <div class="mb-3">
       <label for="amount" class="form-label">Amount (€)</label>
-      <input type="number" class="form-control" name="amount" id="amount" required>
+      <input type="number" class="form-control" name="amount" id="amount" required value="{{data.amount}}">
     </div>
     <div class="mb-3">
         <label for="person" class="form-label">Person</label>
-        <input type="text" class="form-control" name="person" id="person" required>
+        <input type="text" class="form-control" name="person" id="person" required value="{{data.person}}">
     </div>
     <div class="mb-3">
-        <label for="creation_date" class="form-label">Date</label>
-        <input type="date" class="form-control" name="creation_date" id="creation_date">
+      <label for="note" class="form-label">Note</label>
+      <input type="text" class="form-control" name="note" id="note" required value="{{data.note}}">
+    </div>
+    <div class="mb-3">
+        <label for="creation_date" class="form-label">Creation Date</label>
+        <input type="date" class="form-control" name="creation_date" id="creation_date" required value="{{data.creation_date}}">
+    </div>
+    <div class="mb-3">
+      <label for="return_date" class="form-label">Return Date</label>
+      <input type="date" class="form-control" name="return_date" id="return_date" required value="{{data.return_date}}">
     </div>
 
 
