@@ -43,6 +43,8 @@
             <th>Note</th>
             <th>Creation Date</th>
             <th>Return Date</th>
+            <th></th>
+            <th></th>
         </tr>
         {% for row in loans_to %}
             <tr>
@@ -51,7 +53,16 @@
                 <td>{{row.note}}</td>
                 <td>{{row.creation_date}}</td>
                 <td>{{row.return_date}}</td>
-                <td><a href="{{url_for('views.loan_to', id=row.id)}}">Edit</a></td>
+                <td>
+                    <a href="{{url_for('views.loan_to', id=row.id)}}">
+                        <button type="button" class="btn btn-warning">Edit</button>
+                    </a>
+                </td>
+                <td>
+                    <a href="{{url_for('views.delete_loans_to', id=row.id)}}" onclick="return confirm('Are you sure?')">
+                        <button type="button" class="btn btn-danger">Delete</button>
+                    </a>
+                </td>
             </tr>
         {% endfor %}
     </table>

@@ -190,7 +190,7 @@ def delete_expense(id=None):
         data = db.execute("SELECT * FROM expenses WHERE id = ?", (id, )).fetchone()
         # Insert data into bin
         db.execute("""
-            INSERT INTO bin(id, amount, note, expense_location, expense_date, user_id)
+            INSERT INTO expense_bin(id, amount, note, expense_location, expense_date, user_id)
             VALUES (?, ?, ?, ?, ?, ?)
         """, (id, data["amount"], data["note"], data["expense_location"], data["expense_date"], data["user_id"]))
         # Delete data from expenses
@@ -257,7 +257,23 @@ def loan_to(id=None):
         return redirect(url_for("views.login"))
     
 
-@views.route('/delete_loans_to/<int:id>', methods=["GET", "POST"])
+@views.route('/delete_loan_to/<int:id>', methods=["GET", "POST"])
 def delete_loans_to(id=None):
-    #TODO: Move to bin
-    ...
+    if id is not None:
+        #Fetch data
+        data = db.execute("SELECT * FROM loan_to WHERE id = ?", (id, )).fetchone()
+
+        # Move to bin
+        db.execute("""INSERT INTO loan_to_bin (id, amount, person, note, creation_date, return_date, user_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                (data["id"], data["amount"], data["person"], data["note"], data["creation_date"], data["return_date"], data["user_id"])
+                )
+        # Delete from view
+        db.execute("DELETE FROM loan_to WHERE id = ?", (id, ))
+        db.commit()
+        flash("Moved to bin!", "success")
+        return redirect(url_for('views.home'))
+    else:
+        return redirect(url_for("views.home"))
+
+    

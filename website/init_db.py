@@ -42,13 +42,23 @@ db.executescript("""
 
     DROP TABLE IF EXISTS bin;
 
-    CREATE TABLE bin (
+    CREATE TABLE expense_bin (
         id INTEGER PRIMARY KEY,
         amount INTEGER NOT NULL,
         note TEXT NOT NULL,
         expense_location TEXT NOT NULL,
         expense_date TEXT NOT NULL,
         user_id INTEGER NOT NULL
+    );
+                 
+    CREATE TABLE loan_to_bin (
+        id INTEGER NOT NULL,
+        amount INTEGER NOT NULL,
+        person TEXT NOT NULL,
+        note TEXT NOT NULL,
+        creation_date date NOT NULL,
+        return_date date NOT NULL,
+        user_id INTEGER NOT NULL                
     );
 
      """ 
