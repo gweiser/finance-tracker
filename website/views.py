@@ -243,7 +243,7 @@ def loan_to(id=None):
                     VALUES (?, ?, ?, ?, ?, ?, ?)
                            """, (id, amount, person, note, creation_date, return_date, user_id))
                 db.commit()
-                flash("Entry changed!", "success")
+                flash("Changes saved!", "success")
                 return redirect(url_for("views.home"))
         else:
             if request.method == "POST":
