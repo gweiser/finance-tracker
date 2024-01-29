@@ -1,12 +1,23 @@
-from flask import Flask, Blueprint, render_template, request, flash, session, redirect, url_for
+from flask import Flask, Blueprint, render_template, request, flash, session, redirect, url_for, g
 from website import get_db_connection
 from hashlib import pbkdf2_hmac
+from functools import wraps
 
 views = Blueprint('views', __name__)
 
 # Connect to database
 db = get_db_connection()
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        current_user = session["username"]
+        current_user_id_row = db.execute("SELECT id FROM users WHERE username = ?", (current_user, )).fetchone()
+        if current_user_id_row is None:
+            return redirect(url_for('views.login'))
+        return f(*args, **kwargs)
+    return decorated_function
+        
 @views.route('/login', methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -91,12 +102,13 @@ def logout():
 
 
 @views.route('/', methods = ["GET", "POST"])
+@login_required
 def home():
     if request.method == "GET":
         if session["username"] is not None:
             current_user = session["username"]
-            current_user_id_row = db.execute("SELECT id FROM users WHERE username = ?", (current_user, )).fetchone()
-            current_user_id = current_user_id_row["id"]
+            current_user_id = db.execute("SELECT id FROM users WHERE username = ?", (current_user, )).fetchone()["id"]
+
             expenses_row = db.execute("SELECT * FROM expenses WHERE user_id = ?", (current_user_id, )).fetchall()
             loans_to_row = db.execute("SELECT * FROM loan_to WHERE user_id = ?", (current_user_id, )).fetchall()
             # Get all expenses

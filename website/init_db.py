@@ -40,7 +40,7 @@ db.executescript("""
         FOREIGN KEY(user_id) REFERENCES users(id)  
     );
 
-    DROP TABLE IF EXISTS bin;
+    DROP TABLE IF EXISTS expense_bin;
 
     CREATE TABLE expense_bin (
         id INTEGER PRIMARY KEY,
@@ -50,7 +50,8 @@ db.executescript("""
         expense_date TEXT NOT NULL,
         user_id INTEGER NOT NULL
     );
-                 
+
+    DROP TABLE IF EXISTS loan_to_bin;
     CREATE TABLE loan_to_bin (
         id INTEGER NOT NULL,
         amount INTEGER NOT NULL,
