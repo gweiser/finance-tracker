@@ -307,6 +307,19 @@ def bin(item_type=None, id=None):
             db.commit()
 
             return redirect(url_for("views.home"))    
+        elif item_type == "loan_to":
+            # Get data from bin
+            data = db.execute("SELECT * FROM loan_to_bin WHERE id = ?", (id, )).fetchone()
+            # Move data back to home
+            db.execute("""INSERT INTO loan_to (id, amount, person, note, creation_date, return_date, user_id)
+                       VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                       data["id"], data["amount"], data["person"], data["note"], data["creation_date"], data["return_date"], data["user_id"])
+            # Delete data from bin
+            db.execute("DELTE FROM loan_to_bin WHERE id = ?", (id, ))
+            db.commit()
+
+            return redirect(url_for("views.home"))
+            
     else:
         print("foo")
         user_id = db.execute("SELECT id FROM users WHERE username = ?", (session["username"], )).fetchone()["id"]
