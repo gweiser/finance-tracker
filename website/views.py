@@ -147,29 +147,8 @@ def expense(id=None):
     data = None
     user_id = db.execute("SELECT id FROM users WHERE username = ?", (session["username"], )).fetchone()["id"]
 
-    # if edit button is pressed (if an id is inputted)
-    if id is not None:
-        if request.method == "GET":
-            data = db.execute("SELECT * FROM expenses WHERE id = ?", (id, )).fetchone()
-
-            return render_template("expense.html", data=data)
-        else:
-            db.execute("DELETE FROM expenses WHERE id = ?", (id, ))
-
-            amount = request.form.get("amount")
-            note = request.form.get("note")
-            location = request.form.get("location")
-            date = request.form.get("date")
-
-            db.execute("""
-                    INSERT INTO expenses(id, amount, note, expense_location, expense_date, user_id)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                    """, (id, amount, note, location, date, user_id))           
-            db.commit()
-
-            flash("Changes saved!", "success")     
-            return redirect(url_for("views.home"))
-    else:      
+    # if new expense is opened
+    if id is None:
         if request.method == "POST":
             # Get all variables from form
             amount = request.form.get("amount")
@@ -190,6 +169,29 @@ def expense(id=None):
             
         else:
             return render_template("expense.html", data=None)
+        
+    # If expense is edited
+    else:      
+        if request.method == "GET":
+            data = db.execute("SELECT * FROM expenses WHERE id = ?", (id, )).fetchone()
+
+            return render_template("expense.html", data=data)
+        else:
+            db.execute("DELETE FROM expenses WHERE id = ?", (id, ))
+
+            amount = request.form.get("amount")
+            note = request.form.get("note")
+            location = request.form.get("location")
+            date = request.form.get("date")
+
+            db.execute("""
+                    INSERT INTO expenses(id, amount, note, expense_location, expense_date, user_id)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """, (id, amount, note, location, date, user_id))           
+            db.commit()
+
+            flash("Changes saved!", "success")     
+            return redirect(url_for("views.home"))
 
     
     
@@ -220,9 +222,30 @@ def delete_expense(id=None):
 @login_required
 def loan_to(id=None):
     user_id = db.execute("SELECT id FROM users WHERE username = ?", (session["username"], )).fetchone()["id"]
-    # If id is parsed
-    if id is not None:
+    # If new loan_to is opened
+    if id is None:
+        if request.method == "POST":
+            user_id_row = db.execute("SELECT id FROM users WHERE username = ?", (session["username"], )).fetchone()
+            user_id = user_id_row["id"]
+            amount = request.form.get("amount")
+            person = request.form.get("person")
+            note = request.form.get("note")
+            creation_date = request.form.get("creation_date")
+            return_date = request.form.get("return_date")
 
+            # TODO: Insert into database
+            db.execute("""
+                    INSERT INTO loan_to (amount, person, note, creation_date, return_date, user_id)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """, (amount, person, note, creation_date, return_date, user_id))
+            db.commit()
+            flash("Added!", "success")
+            return redirect(url_for("views.home"))                
+        else:
+            return render_template("loan_to.html", data=None)
+        
+    # If loan_to is being edited
+    else:
         if request.method == "GET":
                 data = db.execute("SELECT * FROM loan_to WHERE id = ?", (id, )).fetchone()
 
@@ -244,26 +267,6 @@ def loan_to(id=None):
             db.commit()
             flash("Changes saved!", "success")
             return redirect(url_for("views.home"))
-    else:
-        if request.method == "POST":
-            user_id_row = db.execute("SELECT id FROM users WHERE username = ?", (session["username"], )).fetchone()
-            user_id = user_id_row["id"]
-            amount = request.form.get("amount")
-            person = request.form.get("person")
-            note = request.form.get("note")
-            creation_date = request.form.get("creation_date")
-            return_date = request.form.get("return_date")
-
-            # TODO: Insert into database
-            db.execute("""
-                    INSERT INTO loan_to (amount, person, note, creation_date, return_date, user_id)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                    """, (amount, person, note, creation_date, return_date, user_id))
-            db.commit()
-            flash("Added!", "success")
-            return redirect(url_for("views.home"))                
-        else:
-            return render_template("loan_to.html", data=None)
     
 
 @views.route('/delete_loan_to/<int:id>', methods=["GET", "POST"])
@@ -286,22 +289,40 @@ def delete_loans_to(id=None):
         return redirect(url_for("views.home"))
 
     
-@views.route('/bin')
+@views.route('/bin', methods=["GET", "POST"])
+@views.route('/bin/restore/<string:item_type>/<int:id>', methods=["GET", "POST"])
 @login_required
-def bin():
-    user_id = db.execute("SELECT id FROM users WHERE username = ?", (session["username"])).fetchone()["id"]
-    expense_bin_row = db.execute("SELECT * FROM expenense_bin WHERE user_id = ?", (user_id, )).fetchall()
-    expense_data = []
-    expense_counter = 0
+def bin(item_type=None, id=None):
+    # If bin is being viewed
+    if item_type and id is not None:
+        if item_type == "expense":
+            # Get data from bin
+            data = db.execute("SELECT * FROM expense_bin WHERE id = ?", (id, )).fetchone()
+            # Move data back to home
+            db.execute("""INSERT INTO expenses (id, amount, note, expense_location, expense_date, user_id)
+                       VALUES (?, ?, ?, ?, ?, ?)""",
+                       (data["id"], data["amount"], data["note"], data["expense_location"], data["expense_date"], data["user_id"]))
+            # Delete data from bin
+            db.execute("DELETE FROM expense_bin WHERE id = ?", (id, ))
+            db.commit()
 
-    for _ in expense_bin_row:
-        expense_data.append({
-                "id": expense_bin_row[expense_counter]["id"],
-                "amount": expense_bin_row[expense_counter]["amount"],
-                "note": expense_bin_row[expense_counter]["note"],
-                "expense_location": expense_bin_row[expense_counter]["expense_location"]
-            })
-        expense_counter += 1
+            return redirect(url_for("views.home"))    
+    else:
+        print("foo")
+        user_id = db.execute("SELECT id FROM users WHERE username = ?", (session["username"], )).fetchone()["id"]
+        expense_bin_row = db.execute("SELECT * FROM expense_bin WHERE user_id = ?", (user_id, )).fetchall()
+        expense_data = []
+        expense_counter = 0
 
-    return render_template("bin.html", expense_data=expense_data)
+        for _ in expense_bin_row:
+            expense_data.append({
+                    "id": expense_bin_row[expense_counter]["id"],
+                    "amount": expense_bin_row[expense_counter]["amount"],
+                    "note": expense_bin_row[expense_counter]["note"],
+                    "expense_location": expense_bin_row[expense_counter]["expense_location"],
+                    "expense_date": expense_bin_row[expense_counter]["expense_date"]
+                })
+            expense_counter += 1
+
+        return render_template("bin.html", expense_data=expense_data)
 

@@ -1,7 +1,25 @@
 {% extends "base.html" %}
 
 {% block body %}
+    <br>
+    <h3>Expenses</h3>
     <table class="table">
-        
+        <tr>
+            <th>Amount</th>
+            <th>Note</th>
+            <th>Location</th>
+            <th>Date</th>
+        </tr>
+        {% for row in expense_data %}
+            <tr>
+                <td>{{row.amount}}€</td>
+                <td>{{row.note}}</td>
+                <td>{{row.expense_location}}</td>
+                <td>{{row.expense_date}}</td>
+                <td>
+                    <a href="{{url_for('views.bin', item_type='expense', id=row.id)}}">Restore</a>
+                </td>
+            </tr>
+        {% endfor %}
     </table>
 {% endblock %}
