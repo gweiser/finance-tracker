@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block body %}
+    <h1>Rubbish Bin</h1>
     <br>
     <h3>Expenses</h3>
     <table class="table">
@@ -9,6 +10,7 @@
             <th>Note</th>
             <th>Location</th>
             <th>Date</th>
+            <th></th>
         </tr>
         {% for row in expense_data %}
             <tr>
@@ -17,7 +19,14 @@
                 <td>{{row.expense_location}}</td>
                 <td>{{row.expense_date}}</td>
                 <td>
-                    <a href="{{url_for('views.bin', item_type='expense', id=row.id)}}">Restore</a>
+                    <a href="{{url_for('views.bin', item_type='expense', id=row.id)}}">
+                        <button type="button" class="btn btn-success">Restore</button>
+                    </a>
+                </td>
+                <td>
+                    <a href="{{url_for('views.delete_from_bin', item_type='expense', id=row.id)}}">
+                        <button type="button" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                    </a>
                 </td>
             </tr>
         {% endfor %}
@@ -35,13 +44,20 @@
         </tr>
         {% for row in loan_to_data %}
             <tr>
-                <td>{{row.amount}}</td>
+                <td>{{row.amount}}€</td>
                 <td>{{row.person}}</td>
                 <td>{{row.note}}</td>
                 <td>{{row.creation_date}}</td>
                 <td>{{row.return_date}}</td>
                 <td>
-                    <a href="{{url_for('views.bin', item_type='loan_to', id=row.id)}}">Restore</a>
+                    <a href="{{url_for('views.bin', item_type='loan_to', id=row.id)}}">
+                        <button type="button" class="btn btn-success">Restore</button>
+                    </a>
+                </td>
+                <td>
+                    <a href="{{url_for('views.delete_from_bin', item_type='loan_to', id=row.id)}}">
+                        <button type="button" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                    </a>
                 </td>
             </tr>
         {% endfor %}

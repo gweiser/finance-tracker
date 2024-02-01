@@ -293,7 +293,7 @@ def delete_loans_to(id=None):
 @views.route('/bin/restore/<string:item_type>/<int:id>', methods=["GET", "POST"])
 @login_required
 def bin(item_type=None, id=None):
-    # If bin is being viewed
+    # If restore or delete button pressed
     if item_type and id is not None:
         if item_type == "expense":
             # Get data from bin
@@ -306,7 +306,7 @@ def bin(item_type=None, id=None):
             db.execute("DELETE FROM expense_bin WHERE id = ?", (id, ))
             db.commit()
 
-            return redirect(url_for("views.home"))    
+            return redirect(url_for("views.bin"))    
         elif item_type == "loan_to":
             # Get data from bin
             data = db.execute("SELECT * FROM loan_to_bin WHERE id = ?", (id, )).fetchone()
@@ -318,10 +318,9 @@ def bin(item_type=None, id=None):
             db.execute("DELETE FROM loan_to_bin WHERE id = ?", (id, ))
             db.commit()
 
-            return redirect(url_for("views.home"))
-            
+            return redirect(url_for("views.bin"))
+    # If bin is being viewed
     else:
-        print("foo")
         user_id = db.execute("SELECT id FROM users WHERE username = ?", (session["username"], )).fetchone()["id"]
         expense_bin_row = db.execute("SELECT * FROM expense_bin WHERE user_id = ?", (user_id, )).fetchall()
         loan_to_row = db.execute("SELECT * FROM loan_to_bin WHERE user_id = ?", (user_id, )).fetchall()
@@ -352,4 +351,23 @@ def bin(item_type=None, id=None):
             loan_to_counter += 1
 
         return render_template("bin.html", expense_data=expense_data, loan_to_data=loan_to_data)
+    
+
+@views.route('/delete_from_bin/<string:item_type>/<int:id>')
+def delete_from_bin(item_type=None, id=None):
+    # If delete is pressed
+    if item_type and id is not None:
+        user_id = db.execute("SELECT id FROM users WHERE username = ?", (session["username"], )).fetchone()["id"]
+        
+        if item_type == "expense":
+            db.execute("DELETE FROM expense_bin WHERE id = ? AND user_id = ?", (id, user_id))
+            db.commit()
+        elif item_type == "loan_to":
+            db.execute("DELETE FROM loan_to_bin WHERE id = ? AND user_id = ?", (id, user_id))
+            db.commit()
+
+        return redirect(url_for("views.bin"))
+    # If no id and item_type passed
+    else:
+        return redirect(url_for("views.home"))
 
