@@ -22,4 +22,28 @@
             </tr>
         {% endfor %}
     </table>
+    <br>
+    <h3>Loans To</h3>
+    <table class="table">
+        <tr>
+            <th>Amount</th>
+            <th>Person</th>
+            <th>Note</th>
+            <th>Creation Date</th>
+            <th>Return Date</th>
+            <th></th>
+        </tr>
+        {% for row in loan_to_data %}
+            <tr>
+                <td>{{row.amount}}</td>
+                <td>{{row.person}}</td>
+                <td>{{row.note}}</td>
+                <td>{{row.creation_date}}</td>
+                <td>{{row.return_date}}</td>
+                <td>
+                    <a href="{{url_for('views.bin', item_type='loan_to', id=row.id)}}">Restore</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
 {% endblock %}

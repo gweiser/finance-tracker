@@ -313,9 +313,9 @@ def bin(item_type=None, id=None):
             # Move data back to home
             db.execute("""INSERT INTO loan_to (id, amount, person, note, creation_date, return_date, user_id)
                        VALUES (?, ?, ?, ?, ?, ?, ?)""",
-                       data["id"], data["amount"], data["person"], data["note"], data["creation_date"], data["return_date"], data["user_id"])
+                      (data["id"], data["amount"], data["person"], data["note"], data["creation_date"], data["return_date"], data["user_id"]))
             # Delete data from bin
-            db.execute("DELTE FROM loan_to_bin WHERE id = ?", (id, ))
+            db.execute("DELETE FROM loan_to_bin WHERE id = ?", (id, ))
             db.commit()
 
             return redirect(url_for("views.home"))
@@ -324,8 +324,11 @@ def bin(item_type=None, id=None):
         print("foo")
         user_id = db.execute("SELECT id FROM users WHERE username = ?", (session["username"], )).fetchone()["id"]
         expense_bin_row = db.execute("SELECT * FROM expense_bin WHERE user_id = ?", (user_id, )).fetchall()
+        loan_to_row = db.execute("SELECT * FROM loan_to_bin WHERE user_id = ?", (user_id, )).fetchall()
         expense_data = []
+        loan_to_data = []
         expense_counter = 0
+        loan_to_counter = 0
 
         for _ in expense_bin_row:
             expense_data.append({
@@ -337,5 +340,16 @@ def bin(item_type=None, id=None):
                 })
             expense_counter += 1
 
-        return render_template("bin.html", expense_data=expense_data)
+        for _ in loan_to_row:
+            loan_to_data.append({
+                "id": loan_to_row[loan_to_counter]["id"],
+                "amount": loan_to_row[loan_to_counter]["amount"],
+                "person": loan_to_row[loan_to_counter]["person"],
+                "note": loan_to_row[loan_to_counter]["note"],
+                "creation_date": loan_to_row[loan_to_counter]["creation_date"],
+                "return_date": loan_to_row[loan_to_counter]["return_date"]
+            })
+            loan_to_counter += 1
+
+        return render_template("bin.html", expense_data=expense_data, loan_to_data=loan_to_data)
 
